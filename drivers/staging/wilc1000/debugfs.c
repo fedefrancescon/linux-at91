@@ -9,9 +9,8 @@
 
 #include "debugfs.h"
 
-atomic_t WILC_DEBUG_REGION = ATOMIC_INIT(INIT_DBG | GENERIC_DBG |
-					 CFG80211_DBG | HOSTAPD_DBG |
-					 PWRDEV_DBG);
+atomic_t WILC_DEBUG_REGION = ATOMIC_INIT(INIT_DBG | GENERIC_DBG | CFG80211_DBG | HOSTAPD_DBG | PWRDEV_DBG | CORECONFIG_DBG);
+
 #if KERNEL_VERSION(3, 15, 0) > LINUX_VERSION_CODE
 /**
  * of_irq_parse_raw - Low level interrupt tree parsing

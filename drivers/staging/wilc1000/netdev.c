@@ -872,8 +872,10 @@ static int wilc_wlan_initialize(struct net_device *dev, struct wilc_vif *vif)
 		ret = wilc_start_firmware(dev);
 		if (ret) {
 			PRINT_ER(dev, "Failed to start firmware\n");
-			goto fail_irq_enable;
+			goto fail_fw_start;
 		}
+
+		wl->initialized = true;
 
 		if (cfg_get(vif, 1, WID_FIRMWARE_VERSION, 1, 0)) {
 			int size;
@@ -894,7 +896,6 @@ static int wilc_wlan_initialize(struct net_device *dev, struct wilc_vif *vif)
 			goto fail_fw_start;
 		}
 
-		wl->initialized = true;
 		return 0;
 
 fail_fw_start:

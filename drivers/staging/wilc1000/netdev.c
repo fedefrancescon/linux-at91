@@ -929,7 +929,7 @@ static int wilc_mac_open(struct net_device *ndev)
 {
 	struct wilc_vif *vif = netdev_priv(ndev);
 	struct wilc *wl = vif->wilc;
-	unsigned char mac_add[ETH_ALEN] = {0};
+	unsigned char mac_add[ETH_ALEN] __aligned(2) = { 0 };
 	int ret = 0;
 
 	if (!wl || !wl->dev) {
@@ -1000,7 +1000,7 @@ static int wilc_set_mac_addr(struct net_device *dev, void *p)
 	struct wilc_vif *vif = netdev_priv(dev);
 	struct sockaddr *addr = (struct sockaddr *)p;
 	struct wilc *wilc = vif->wilc;
-	unsigned char mac_addr[6] = {0};
+	unsigned char mac_addr[6] __aligned(2) = { 0 };
 	struct wilc_vif *tmp_vif;
 	int srcu_idx;
 

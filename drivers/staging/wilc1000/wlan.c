@@ -885,9 +885,12 @@ static void chip_wakeup_wilc3000(struct wilc *wilc, int source)
 		/* in case of failure, Reset the wakeup bit to introduce a new
 		 * edge on the next loop
 		 */
-		if ((clk_status_reg_val & clk_status_bit) == 0)
+		if ((clk_status_reg_val & clk_status_bit) == 0) {
 			hif_func->hif_write_reg(wilc, wakeup_reg,
 						wakeup_reg_val & (~wakeup_bit));
+			/* added wait before wakeup sequence retry */
+			usleep_range(200, 300);
+		}
 	} while (((clk_status_reg_val & clk_status_bit) == 0)
 		 && (wake_seq_trials-- > 0));
 	if (!wake_seq_trials)
@@ -1261,10 +1264,10 @@ int wilc_wlan_handle_txq(struct wilc *wilc, u32 *txq_count)
 
 out_release_bus:
 	release_bus(wilc, WILC_BUS_RELEASE_ALLOW_SLEEP, DEV_WIFI);
-	schedule();
 
 out_unlock:
 	mutex_unlock(&wilc->txq_add_to_head_cs);
+	schedule();
 
 out_update_cnt:
 	*txq_count = wilc->txq_entries;

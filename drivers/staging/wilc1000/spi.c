@@ -168,12 +168,14 @@ free:
 static int wilc_bus_remove(struct spi_device *spi)
 {
 	struct wilc *wilc = spi_get_drvdata(spi);
+	struct wilc_spi *spi_priv = wilc->bus_data;
 
 	if (!IS_ERR(wilc->rtc_clk))
 		clk_disable_unprepare(wilc->rtc_clk);
 
 	wilc_netdev_cleanup(wilc);
 	wilc_bt_deinit();
+	kfree(spi_priv);
 	return 0;
 }
 

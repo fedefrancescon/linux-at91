@@ -227,12 +227,14 @@ free:
 static void wilc_sdio_remove(struct sdio_func *func)
 {
 	struct wilc *wilc = sdio_get_drvdata(func);
+	struct wilc_sdio *sdio_priv = wilc->bus_data;
 
 	if (!IS_ERR(wilc->rtc_clk))
 		clk_disable_unprepare(wilc->rtc_clk);
 
 	wilc_netdev_cleanup(wilc);
 	wilc_bt_deinit();
+	kfree(sdio_priv);
 }
 
 static int wilc_sdio_reset(struct wilc *wilc)

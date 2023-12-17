@@ -744,13 +744,14 @@ static void wilc_wlan_deinitialize(struct net_device *dev)
 	struct wilc_vif *vif = netdev_priv(dev);
 	struct wilc *wl = vif->wilc;
 
+	if (!wl) {
+		PRINT_ER(dev, "wl is NULL\n");
+		return;
+	}
+
+
 	if (wl->initialized) {
 		PRINT_INFO(vif->ndev, INIT_DBG, "Deinitializing wilc  ...\n");
-
-		if (!wl) {
-			PRINT_ER(dev, "wl is NULL\n");
-			return;
-		}
 
 		PRINT_D(vif->ndev, INIT_DBG, "destroy aging timer\n");
 

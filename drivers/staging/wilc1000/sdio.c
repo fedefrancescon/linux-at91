@@ -221,6 +221,7 @@ dispose_irq:
 	wilc_netdev_cleanup(wilc);
 free:
 	kfree(sdio_priv);
+	wilc->bus_data = NULL;
 	return ret;
 }
 
@@ -235,6 +236,7 @@ static void wilc_sdio_remove(struct sdio_func *func)
 	wilc_netdev_cleanup(wilc);
 	wilc_bt_deinit();
 	kfree(sdio_priv);
+	wilc->bus_data = NULL;
 }
 
 static int wilc_sdio_reset(struct wilc *wilc)

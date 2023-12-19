@@ -261,6 +261,9 @@ static int wilc_sdio_reset(struct wilc *wilc)
 static bool wilc_sdio_is_init(struct wilc *wilc)
 {
 	struct wilc_sdio *sdio_priv = wilc->bus_data;
+	if (!sdio_priv) {
+		return false;
+	}
 
 	return sdio_priv->is_init;
 }
@@ -412,6 +415,11 @@ static int wilc_sdio_write_reg(struct wilc *wilc, u32 addr, u32 data)
 {
 	struct sdio_func *func = dev_to_sdio_func(wilc->dev);
 	struct wilc_sdio *sdio_priv = wilc->bus_data;
+	if (!sdio_priv) {
+		dev_err(&func->dev, "%s: 'bus_data' not initialized\n", __FUNC__);
+		return -1;
+	}
+
 	int ret;
 
 	cpu_to_le32s(&data);
@@ -463,6 +471,11 @@ static int wilc_sdio_write(struct wilc *wilc, u32 addr, u8 *buf, u32 size)
 {
 	struct sdio_func *func = dev_to_sdio_func(wilc->dev);
 	struct wilc_sdio *sdio_priv = wilc->bus_data;
+	if (!sdio_priv) {
+		dev_err(&func->dev, "%s: 'bus_data' not initialized\n", __FUNC__);
+		return -1;
+	}
+
 	u32 block_size = sdio_priv->block_size;
 	struct sdio_cmd53 cmd;
 	int nblk, nleft, ret;
@@ -536,6 +549,10 @@ static int wilc_sdio_read_reg(struct wilc *wilc, u32 addr, u32 *data)
 {
 	struct sdio_func *func = dev_to_sdio_func(wilc->dev);
 	struct wilc_sdio *sdio_priv = wilc->bus_data;
+	if (!sdio_priv) {
+		dev_err(&func->dev, "%s: 'bus_data' not initialized\n", __FUNC__);
+		return -1;
+	}
 	int ret;
 
 	if (addr >= 0xf0 && addr <= 0xff) { /* only vendor specific registers */
@@ -584,6 +601,10 @@ static int wilc_sdio_read(struct wilc *wilc, u32 addr, u8 *buf, u32 size)
 {
 	struct sdio_func *func = dev_to_sdio_func(wilc->dev);
 	struct wilc_sdio *sdio_priv = wilc->bus_data;
+	if (!sdio_priv) {
+		dev_err(&func->dev, "%s: 'bus_data' not initialized\n", __FUNC__);
+		return -1;
+	}
 	u32 block_size = sdio_priv->block_size;
 	struct sdio_cmd53 cmd;
 	int nblk, nleft, ret;
@@ -664,7 +685,9 @@ static int wilc_sdio_deinit(struct wilc *wilc)
 	struct sdio_func *func = dev_to_sdio_func(wilc->dev);
 	struct wilc_sdio *sdio_priv = wilc->bus_data;
 
-	sdio_priv->is_init = false;
+	if (sdio_priv) {
+		sdio_priv->is_init = false;
+	}
 
 	pm_runtime_put_sync_autosuspend(mmc_dev(func->card->host));
 	wilc_wlan_power(wilc, false);
@@ -676,6 +699,11 @@ static int wilc_sdio_init(struct wilc *wilc, bool resume)
 {
 	struct sdio_func *func = dev_to_sdio_func(wilc->dev);
 	struct wilc_sdio *sdio_priv = wilc->bus_data;
+	if (!sdio_priv) {
+		dev_err(&func->dev, "%s: 'bus_data' not initialized\n", __FUNC__);
+		return -1;
+	}
+
 	struct sdio_cmd52 cmd;
 	int loop, ret;
 	u32 chipid;
@@ -834,6 +862,11 @@ static int wilc_sdio_read_int(struct wilc *wilc, u32 *int_status)
 {
 	struct sdio_func *func = dev_to_sdio_func(wilc->dev);
 	struct wilc_sdio *sdio_priv = wilc->bus_data;
+	if (!sdio_priv) {
+		dev_err(&func->dev, "%s: 'bus_data' not initialized\n", __FUNC__);
+		return -1;
+	}
+
 	u32 tmp;
 	struct sdio_cmd52 cmd;
 	u32 irq_flags;
@@ -883,6 +916,11 @@ static int wilc_sdio_clear_int_ext(struct wilc *wilc, u32 val)
 {
 	struct sdio_func *func = dev_to_sdio_func(wilc->dev);
 	struct wilc_sdio *sdio_priv = wilc->bus_data;
+	if (!sdio_priv) {
+		dev_err(&func->dev, "%s: 'bus_data' not initialized\n", __FUNC__);
+		return -1;
+	}
+
 	int ret;
 	u32 reg = 0;
 
@@ -974,6 +1012,11 @@ static int wilc_sdio_sync_ext(struct wilc *wilc, int nint)
 {
 	struct sdio_func *func = dev_to_sdio_func(wilc->dev);
 	struct wilc_sdio *sdio_priv = wilc->bus_data;
+	if (!sdio_priv) {
+		dev_err(&func->dev, "%s: 'bus_data' not initialized\n", __FUNC__);
+		return -1;
+	}
+
 	u32 reg;
 	int ret, i;
 

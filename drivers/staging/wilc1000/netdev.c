@@ -13,11 +13,16 @@
 #include <linux/interrupt.h>
 #include <net/ip.h>
 #include <linux/module.h>
+#include <linux/delay.h>
 
 #include "netdev.h"
 #include "cfg80211.h"
 
 #define WILC_MULTICAST_TABLE_SIZE	8
+
+#define INIT_TIMEOUT   300
+#define DEINIT_TIMEOUT 10000
+
 
 static int wilc_mac_open(struct net_device *ndev);
 static int wilc_mac_close(struct net_device *ndev);
@@ -786,6 +791,10 @@ static void wilc_wlan_deinitialize(struct net_device *dev)
 	} else {
 		PRINT_INFO(dev, INIT_DBG, "wilc is not initialized\n");
 	}
+
+        pr_info("%s: Will sleep a bit after deinitialize\n", __func__);
+        msleep(DEINIT_TIMEOUT);
+
 }
 
 static int wlan_initialize_threads(struct net_device *dev)
@@ -826,6 +835,9 @@ static int wilc_wlan_initialize(struct net_device *dev, struct wilc_vif *vif)
 {
 	int ret = 0;
 	struct wilc *wl = vif->wilc;
+
+        pr_info("%s: Will sleep a bit before initialize\n", __func__);
+        msleep(INIT_TIMEOUT);
 
 	if (!wl->initialized) {
 		wl->mac_status = WILC_MAC_STATUS_INIT;
@@ -872,8 +884,10 @@ static int wilc_wlan_initialize(struct net_device *dev, struct wilc_vif *vif)
 		ret = wilc_start_firmware(dev);
 		if (ret) {
 			PRINT_ER(dev, "Failed to start firmware\n");
-			goto fail_irq_enable;
+			goto fail_fw_start;
 		}
+
+		wl->initialized = true;
 
 		if (cfg_get(vif, 1, WID_FIRMWARE_VERSION, 1, 0)) {
 			int size;
@@ -894,7 +908,6 @@ static int wilc_wlan_initialize(struct net_device *dev, struct wilc_vif *vif)
 			goto fail_fw_start;
 		}
 
-		wl->initialized = true;
 		return 0;
 
 fail_fw_start:

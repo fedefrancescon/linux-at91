@@ -786,6 +786,8 @@ static void wilc_wlan_deinitialize(struct net_device *dev)
 		wilc_wlan_cleanup(dev);
 
 		wl->initialized = false;
+		wl->close = 0;
+		wl->quit = 0;
 
 		PRINT_INFO(dev, INIT_DBG, "wilc deinitialization Done\n");
 	} else {
@@ -842,6 +844,7 @@ static int wilc_wlan_initialize(struct net_device *dev, struct wilc_vif *vif)
 	if (!wl->initialized) {
 		wl->mac_status = WILC_MAC_STATUS_INIT;
 		wl->close = 0;
+		wl->quit = 0;
 		wl->initialized = 0;
 
 		ret = wilc_wlan_init(dev);

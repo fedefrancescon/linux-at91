@@ -1192,6 +1192,9 @@ static int wilc_mac_close(struct net_device *ndev)
 		wl->close = 1;
 
 		wilc_wlan_deinitialize(ndev);
+
+		PRINT_INFO(ndev, GENERIC_DBG, "Powering down wilc\n");
+		wilc_bt_power_down(wl, DEV_WIFI);
 	}
 
 	vif->mac_opened = 0;

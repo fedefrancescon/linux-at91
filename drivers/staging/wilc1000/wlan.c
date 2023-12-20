@@ -1889,6 +1889,7 @@ int wilc_wlan_init(struct net_device *dev)
 	wilc = vif->wilc;
 
 	wilc->quit = 0;
+	wilc->close = 0;
 
 	PRINT_INFO(vif->ndev, INIT_DBG, "Initializing WILC_Wlan\n");
 

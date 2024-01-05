@@ -750,9 +750,12 @@ static void wilc_wlan_deinitialize(struct net_device *dev)
 		return;
 	}
 
-
 	if (wl->initialized) {
 		PRINT_INFO(vif->ndev, INIT_DBG, "Deinitializing wilc  ...\n");
+
+		ret = wilc_wlan_stop(wl, vif);
+		if (ret != 0)
+			PRINT_ER(dev, "failed in wlan_stop\n");
 
 		PRINT_D(vif->ndev, INIT_DBG, "destroy aging timer\n");
 
@@ -767,16 +770,11 @@ static void wilc_wlan_deinitialize(struct net_device *dev)
 				mutex_unlock(&wl->hif_cs);
 			}
 		}
-		complete(&wl->txq_event);
+		deinit_irq(dev);
 
 		PRINT_INFO(vif->ndev, INIT_DBG, "Deinitializing Threads\n");
 		wlan_deinitialize_threads(dev);
 		PRINT_INFO(vif->ndev, INIT_DBG, "Deinitializing IRQ\n");
-		deinit_irq(dev);
-
-		ret = wilc_wlan_stop(wl, vif);
-		if (ret != 0)
-			PRINT_ER(dev, "failed in wlan_stop\n");
 
 		PRINT_INFO(vif->ndev, INIT_DBG, "Deinitializing WILC Wlan\n");
 		wilc_wlan_cleanup(dev);

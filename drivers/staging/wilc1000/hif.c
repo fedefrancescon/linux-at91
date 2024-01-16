@@ -1819,10 +1819,16 @@ int wilc_get_rssi(struct wilc_vif *vif, s8 *rssi_level)
 {
 	struct wid wid;
 	int result;
+	struct wilc *wilc = vif->wilc;
 
 	if (!rssi_level) {
 		PRINT_ER(vif->ndev, "RSS pointer value is null\n");
 		return -EFAULT;
+	}
+
+	if (!wilc->initialized) {
+		netdev_info(vif->ndev, "Driver not initialized\n");
+		return 0;
 	}
 
 	wid.id = WID_RSSI;

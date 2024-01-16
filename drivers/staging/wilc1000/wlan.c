@@ -1550,10 +1550,6 @@ int wilc_wlan_start(struct wilc *wilc)
 	ret = wilc->hif_func->hif_write_reg(wilc, WILC_GLB_RESET_0, reg);
 	wilc->hif_func->hif_read_reg(wilc, WILC_GLB_RESET_0, &reg);
 
-	if (!ret)
-		wilc->initialized = 1;
-	else
-		wilc->initialized = 0;
 	release_bus(wilc, WILC_BUS_RELEASE_ALLOW_SLEEP, DEV_WIFI);
 
 	return (ret < 0) ? ret : 0;
@@ -1889,6 +1885,7 @@ int wilc_wlan_init(struct net_device *dev)
 	wilc = vif->wilc;
 
 	wilc->quit = 0;
+	wilc->close = 0;
 
 	PRINT_INFO(vif->ndev, INIT_DBG, "Initializing WILC_Wlan\n");
 

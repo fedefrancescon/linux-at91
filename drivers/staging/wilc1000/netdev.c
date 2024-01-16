@@ -20,10 +20,6 @@
 
 #define WILC_MULTICAST_TABLE_SIZE	8
 
-#define INIT_TIMEOUT   300
-#define DEINIT_TIMEOUT 10000
-
-
 static int wilc_mac_open(struct net_device *ndev);
 static int wilc_mac_close(struct net_device *ndev);
 
@@ -754,9 +750,12 @@ static void wilc_wlan_deinitialize(struct net_device *dev)
 		return;
 	}
 
-
 	if (wl->initialized) {
 		PRINT_INFO(vif->ndev, INIT_DBG, "Deinitializing wilc  ...\n");
+
+		ret = wilc_wlan_stop(wl, vif);
+		if (ret != 0)
+			PRINT_ER(dev, "failed in wlan_stop\n");
 
 		PRINT_D(vif->ndev, INIT_DBG, "destroy aging timer\n");
 
@@ -771,30 +770,23 @@ static void wilc_wlan_deinitialize(struct net_device *dev)
 				mutex_unlock(&wl->hif_cs);
 			}
 		}
-		complete(&wl->txq_event);
+		deinit_irq(dev);
 
 		PRINT_INFO(vif->ndev, INIT_DBG, "Deinitializing Threads\n");
 		wlan_deinitialize_threads(dev);
 		PRINT_INFO(vif->ndev, INIT_DBG, "Deinitializing IRQ\n");
-		deinit_irq(dev);
-
-		ret = wilc_wlan_stop(wl, vif);
-		if (ret != 0)
-			PRINT_ER(dev, "failed in wlan_stop\n");
 
 		PRINT_INFO(vif->ndev, INIT_DBG, "Deinitializing WILC Wlan\n");
 		wilc_wlan_cleanup(dev);
 
 		wl->initialized = false;
+		wl->close = 0;
+		wl->quit = 0;
 
 		PRINT_INFO(dev, INIT_DBG, "wilc deinitialization Done\n");
 	} else {
 		PRINT_INFO(dev, INIT_DBG, "wilc is not initialized\n");
 	}
-
-        pr_info("%s: Will sleep a bit after deinitialize\n", __func__);
-        msleep(DEINIT_TIMEOUT);
-
 }
 
 static int wlan_initialize_threads(struct net_device *dev)
@@ -836,13 +828,8 @@ static int wilc_wlan_initialize(struct net_device *dev, struct wilc_vif *vif)
 	int ret = 0;
 	struct wilc *wl = vif->wilc;
 
-        pr_info("%s: Will sleep a bit before initialize\n", __func__);
-        msleep(INIT_TIMEOUT);
-
 	if (!wl->initialized) {
 		wl->mac_status = WILC_MAC_STATUS_INIT;
-		wl->close = 0;
-		wl->initialized = 0;
 
 		ret = wilc_wlan_init(dev);
 		if (ret) {
@@ -924,6 +911,7 @@ fail_threads:
 fail_wilc_wlan:
 		wilc_wlan_cleanup(dev);
 		PRINT_ER(dev, "WLAN initialization FAILED\n");
+		wl->initialized = false;
 	} else {
 		PRINT_WRN(vif->ndev, INIT_DBG, "wilc already initialized\n");
 	}
@@ -1189,6 +1177,9 @@ static int wilc_mac_close(struct net_device *ndev)
 		wl->close = 1;
 
 		wilc_wlan_deinitialize(ndev);
+
+		PRINT_INFO(ndev, GENERIC_DBG, "Powering down wilc\n");
+		wilc_bt_power_down(wl, DEV_WIFI);
 	}
 
 	vif->mac_opened = 0;

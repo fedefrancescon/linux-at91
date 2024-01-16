@@ -162,6 +162,7 @@ netdev_cleanup:
 	wilc_netdev_cleanup(wilc);
 free:
 	kfree(spi_priv);
+	wilc->bus_data = NULL;
 	return ret;
 }
 
@@ -176,6 +177,7 @@ static int wilc_bus_remove(struct spi_device *spi)
 	wilc_netdev_cleanup(wilc);
 	wilc_bt_deinit();
 	kfree(spi_priv);
+	wilc->bus_data = NULL;
 	return 0;
 }
 

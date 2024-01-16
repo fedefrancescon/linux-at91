@@ -307,7 +307,7 @@ int wilc_bt_power_down(struct wilc *wilc, int source)
 
 	mutex_lock(&wilc->cs);
 
-	pr_info("source: %s, current bus status Wifi: %d, BT: %d\n",
+	pr_info("POWERING DOWN: source: %s, current bus status Wifi: %d, BT: %d\n",
 		 (source == DEV_WIFI ? "Wifi" : "BT"),
 		 wilc->power.status[DEV_WIFI],
 		 wilc->power.status[DEV_BT]);
@@ -327,6 +327,7 @@ int wilc_bt_power_down(struct wilc *wilc, int source)
 		release_bus(wilc, WILC_BUS_RELEASE_ONLY, source);
 		if (ret) {
 			mutex_unlock(&wilc->cs);
+			pr_err("deinit failed ret: 0x%0x\n", ret);
 			return ret;
 		}
 	}
@@ -346,7 +347,7 @@ int wilc_bt_power_up(struct wilc *wilc, int source)
 
 	mutex_lock(&wilc->cs);
 
-	pr_debug("source: %s, current bus status Wifi: %d, BT: %d\n",
+	pr_info("POWERING UP: source: %s, current bus status Wifi: %d, BT: %d\n",
 		 (source == DEV_WIFI ? "Wifi" : "BT"),
 		 wilc->power.status[DEV_WIFI],
 		 wilc->power.status[DEV_BT]);

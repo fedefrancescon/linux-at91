@@ -911,6 +911,7 @@ fail_threads:
 fail_wilc_wlan:
 		wilc_wlan_cleanup(dev);
 		PRINT_ER(dev, "WLAN initialization FAILED\n");
+		wl->initialized = false;
 	} else {
 		PRINT_WRN(vif->ndev, INIT_DBG, "wilc already initialized\n");
 	}
